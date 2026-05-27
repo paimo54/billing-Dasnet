@@ -79,3 +79,22 @@ Route::middleware('auth:sanctum')->prefix('routers')->name('api.routers.')->grou
 Route::get('/coverage-areas/geojson', [CoverageAreaController::class, 'geojson'])->name('api.coverage-areas.geojson');
 Route::get('/coverage-areas/by-region', [CoverageAreaController::class, 'byRegion'])->name('api.coverage-areas.by-region');
 
+/*
+|--------------------------------------------------------------------------
+| WhatsApp Gateway Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->prefix('whatsapp')->name('api.whatsapp.')->group(function () {
+    // Templates
+    Route::get('/templates', [\App\Http\Controllers\WhatsappTemplateController::class, 'getTemplates'])->name('templates');
+    Route::get('/templates/{template}/variables', [\App\Http\Controllers\WhatsappTemplateController::class, 'getVariables'])->name('templates.variables');
+
+    // Messages
+    Route::post('/send', [\App\Http\Controllers\WhatsappMessageController::class, 'send'])->name('send');
+    Route::post('/send-direct', [\App\Http\Controllers\WhatsappMessageController::class, 'sendDirect'])->name('send-direct');
+    Route::post('/bulk-send', [\App\Http\Controllers\WhatsappMessageController::class, 'bulkSend'])->name('bulk-send');
+    Route::get('/customer/{customer}/history', [\App\Http\Controllers\WhatsappMessageController::class, 'customerHistory'])->name('customer.history');
+    Route::get('/statistics', [\App\Http\Controllers\WhatsappMessageController::class, 'statistics'])->name('statistics');
+});
+

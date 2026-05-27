@@ -168,6 +168,41 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('coverage-areas', CoverageAreaController::class);
     Route::get('/coverage-areas/geojson', [CoverageAreaController::class, 'geojson'])->name('coverage-areas.geojson');
     Route::get('/coverage-areas/by-region', [CoverageAreaController::class, 'byRegion'])->name('coverage-areas.by-region');
+
+    // WhatsApp Gateway
+    Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
+        // Templates
+        Route::get('/templates', [\App\Http\Controllers\WhatsappTemplateController::class, 'index'])->name('templates.index');
+        Route::get('/templates/create', [\App\Http\Controllers\WhatsappTemplateController::class, 'create'])->name('templates.create');
+        Route::post('/templates', [\App\Http\Controllers\WhatsappTemplateController::class, 'store'])->name('templates.store');
+        Route::get('/templates/{template}', [\App\Http\Controllers\WhatsappTemplateController::class, 'show'])->name('templates.show');
+        Route::get('/templates/{template}/edit', [\App\Http\Controllers\WhatsappTemplateController::class, 'edit'])->name('templates.edit');
+        Route::put('/templates/{template}', [\App\Http\Controllers\WhatsappTemplateController::class, 'update'])->name('templates.update');
+        Route::delete('/templates/{template}', [\App\Http\Controllers\WhatsappTemplateController::class, 'destroy'])->name('templates.destroy');
+        Route::post('/templates/{template}/toggle', [\App\Http\Controllers\WhatsappTemplateController::class, 'toggleActive'])->name('templates.toggle');
+
+        // Messages
+        Route::get('/messages', [\App\Http\Controllers\WhatsappMessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{message}', [\App\Http\Controllers\WhatsappMessageController::class, 'show'])->name('messages.show');
+        Route::post('/messages/send', [\App\Http\Controllers\WhatsappMessageController::class, 'send'])->name('messages.send');
+        Route::post('/messages/send-direct', [\App\Http\Controllers\WhatsappMessageController::class, 'sendDirect'])->name('messages.send-direct');
+        Route::post('/messages/bulk-send', [\App\Http\Controllers\WhatsappMessageController::class, 'bulkSend'])->name('messages.bulk-send');
+        Route::post('/messages/{message}/resend', [\App\Http\Controllers\WhatsappMessageController::class, 'resend'])->name('messages.resend');
+        Route::delete('/messages/{message}', [\App\Http\Controllers\WhatsappMessageController::class, 'destroy'])->name('messages.destroy');
+
+        // Providers
+        Route::get('/providers', [\App\Http\Controllers\WhatsappProviderController::class, 'index'])->name('providers.index');
+        Route::get('/providers/create', [\App\Http\Controllers\WhatsappProviderController::class, 'create'])->name('providers.create');
+        Route::post('/providers', [\App\Http\Controllers\WhatsappProviderController::class, 'store'])->name('providers.store');
+        Route::get('/providers/{provider}', [\App\Http\Controllers\WhatsappProviderController::class, 'show'])->name('providers.show');
+        Route::get('/providers/{provider}/edit', [\App\Http\Controllers\WhatsappProviderController::class, 'edit'])->name('providers.edit');
+        Route::put('/providers/{provider}', [\App\Http\Controllers\WhatsappProviderController::class, 'update'])->name('providers.update');
+        Route::delete('/providers/{provider}', [\App\Http\Controllers\WhatsappProviderController::class, 'destroy'])->name('providers.destroy');
+        Route::post('/providers/{provider}/toggle', [\App\Http\Controllers\WhatsappProviderController::class, 'toggleActive'])->name('providers.toggle');
+        Route::post('/providers/{provider}/set-default', [\App\Http\Controllers\WhatsappProviderController::class, 'setDefault'])->name('providers.set-default');
+        Route::post('/providers/{provider}/reset-counter', [\App\Http\Controllers\WhatsappProviderController::class, 'resetCounter'])->name('providers.reset-counter');
+        Route::post('/providers/{provider}/test', [\App\Http\Controllers\WhatsappProviderController::class, 'testConnection'])->name('providers.test');
+    });
 });
 
 // Route untuk Teknisi
