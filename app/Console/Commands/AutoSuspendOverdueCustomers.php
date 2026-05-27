@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Services\NetworkService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -17,7 +18,8 @@ class AutoSuspendOverdueCustomers extends Command
      */
     protected $signature = 'billing:auto-suspend
                             {--grace-days=7 : Grace period in days after due date}
-                            {--dry-run : Run without actually suspending customers}';
+                            {--dry-run : Run without actually suspending customers}
+                            {--method=auto : Suspend method: auto, radius, mikrotik}';
 
     /**
      * The console command description.
@@ -26,6 +28,14 @@ class AutoSuspendOverdueCustomers extends Command
      */
     protected $description = 'Automatically suspend customers with overdue invoices';
 
+    protected $networkService;
+
+    public function __construct(NetworkService $networkService)
+    {
+        parent::__construct();
+        $this->networkService = $networkService;
+    }
+
     /**
      * Execute the console command.
      */
@@ -33,9 +43,11 @@ class AutoSuspendOverdueCustomers extends Command
     {
         $graceDays = (int) $this->option('grace-days');
         $dryRun = $this->option('dry-run');
+        $method = $this->option('method');
 
         $this->info('Starting auto-suspend process...');
         $this->info("Grace period: {$graceDays} days");
+        $this->info("Method: {$method}");
 
         if ($dryRun) {
             $this->warn('DRY RUN MODE - No customers will be suspended');
@@ -81,23 +93,30 @@ class AutoSuspendOverdueCustomers extends Command
 
             if (!$dryRun) {
                 try {
-                    // Suspend customer
-                    $customer->is_active = false;
-                    $customer->save();
+                    // Suspend using NetworkService (hybrid method)
+                    $result = $this->networkService->suspendCustomer($customer);
 
-                    // TODO: Integrate with Mikrotik to disable service
-                    // $this->suspendMikrotikService($customer);
+                    if ($result['success']) {
+                        $suspendedCount++;
 
-                    $suspendedCount++;
+                        Log::info('Customer suspended due to overdue payment', [
+                            'customer_id' => $customer->id,
+                            'customer_name' => $customer->name,
+                            'overdue_amount' => $overdueAmount,
+                            'grace_days' => $graceDays,
+                            'method_used' => $result['method_used'],
+                        ]);
 
-                    Log::info('Customer suspended due to overdue payment', [
-                        'customer_id' => $customer->id,
-                        'customer_name' => $customer->name,
-                        'overdue_amount' => $overdueAmount,
-                        'grace_days' => $graceDays
-                    ]);
+                        $this->info("  ✓ Suspended via {$result['method_used']}");
+                    } else {
+                        $errorCount++;
+                        $this->error("  ✗ Failed to suspend");
 
-                    $this->info("  ✓ Suspended");
+                        Log::error('Failed to suspend customer', [
+                            'customer_id' => $customer->id,
+                            'result' => $result,
+                        ]);
+                    }
 
                 } catch (\Exception $e) {
                     $errorCount++;
@@ -105,7 +124,7 @@ class AutoSuspendOverdueCustomers extends Command
 
                     Log::error('Error suspending customer', [
                         'customer_id' => $customer->id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             } else {
@@ -127,23 +146,5 @@ class AutoSuspendOverdueCustomers extends Command
         }
 
         return Command::SUCCESS;
-    }
-
-    /**
-     * Suspend service in Mikrotik
-     * TODO: Implement Mikrotik API integration
-     */
-    private function suspendMikrotikService($customer): void
-    {
-        // This will be implemented when Mikrotik integration is added
-        // Example:
-        // $mikrotik = new MikrotikAPI();
-        // $mikrotik->connect();
-        // $mikrotik->disableUser($customer->id);
-        // $mikrotik->disconnect();
-
-        Log::info('Mikrotik suspension pending implementation', [
-            'customer_id' => $customer->id
-        ]);
     }
 }

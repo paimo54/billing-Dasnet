@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\NetworkController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +35,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payment/create', [PaymentController::class, 'create'])->name('api.payment.create');
     Route::get('/payment/{payment}/status', [PaymentController::class, 'checkStatus'])->name('api.payment.status');
     Route::get('/payment/invoice/{invoice}/history', [PaymentController::class, 'history'])->name('api.payment.history');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Network Management Routes (FreeRADIUS + Mikrotik)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->prefix('network')->name('api.network.')->group(function () {
+    // Suspend/Unsuspend
+    Route::post('/customer/{customer}/suspend', [NetworkController::class, 'suspend'])->name('suspend');
+    Route::post('/customer/{customer}/unsuspend', [NetworkController::class, 'unsuspend'])->name('unsuspend');
+
+    // Status
+    Route::get('/customer/{customer}/status', [NetworkController::class, 'status'])->name('status');
+
+    // Batch operations
+    Route::post('/batch/suspend', [NetworkController::class, 'batchSuspend'])->name('batch.suspend');
 });

@@ -143,8 +143,11 @@ class QrisService
                 $invoice = $payment->invoice;
                 $invoice->update(['status' => 'paid']);
 
-                // TODO: Unsuspend customer service if suspended
-                // $this->unsuspendCustomerService($invoice->customer);
+                // Auto-unsuspend customer service if suspended
+                if (!$invoice->customer->is_active) {
+                    $networkService = app(\App\Services\NetworkService::class);
+                    $networkService->autoUnsuspendAfterPayment($invoice->customer);
+                }
 
                 Log::info('Payment success via QRIS callback', [
                     'payment_id' => $payment->id,
