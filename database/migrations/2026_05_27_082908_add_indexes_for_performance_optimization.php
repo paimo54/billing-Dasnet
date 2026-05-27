@@ -86,16 +86,15 @@ return new class extends Migration
             // Index untuk filter by technician
             $table->index('technician_id', 'idx_mitra_reports_technician_id');
 
-            // Index untuk filter by month/year
-            $table->index('month', 'idx_mitra_reports_month');
-            $table->index('year', 'idx_mitra_reports_year');
+            // Index untuk periode
+            $table->index('periode_awal', 'idx_mitra_reports_periode_awal');
+            $table->index('periode_akhir', 'idx_mitra_reports_periode_akhir');
 
-            // Index untuk payment status
-            $table->index('payment_status', 'idx_mitra_reports_payment_status');
+            // Index untuk payment status (is_paid)
+            $table->index('is_paid', 'idx_mitra_reports_is_paid');
 
             // Composite index untuk query laporan
-            $table->index(['technician_id', 'year', 'month'], 'idx_mitra_reports_tech_period');
-            $table->index(['year', 'month', 'payment_status'], 'idx_mitra_reports_period_status');
+            $table->index(['technician_id', 'periode_awal'], 'idx_mitra_reports_tech_periode');
         });
     }
 
@@ -142,11 +141,10 @@ return new class extends Migration
 
         Schema::table('mitra_reports', function (Blueprint $table) {
             $table->dropIndex('idx_mitra_reports_technician_id');
-            $table->dropIndex('idx_mitra_reports_month');
-            $table->dropIndex('idx_mitra_reports_year');
-            $table->dropIndex('idx_mitra_reports_payment_status');
-            $table->dropIndex('idx_mitra_reports_tech_period');
-            $table->dropIndex('idx_mitra_reports_period_status');
+            $table->dropIndex('idx_mitra_reports_periode_awal');
+            $table->dropIndex('idx_mitra_reports_periode_akhir');
+            $table->dropIndex('idx_mitra_reports_is_paid');
+            $table->dropIndex('idx_mitra_reports_tech_periode');
         });
     }
 };
