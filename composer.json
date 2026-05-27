@@ -1,7 +1,7 @@
 {
     "name": "billing-dasnet/isp-billing-management",
     "type": "project",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "description": "Enterprise ISP Billing Management System - Professional billing solution for Internet Service Providers",
     "keywords": ["laravel", "framework", "billing", "isp", "internet-service-provider", "invoice", "payment"],
     "license": "MIT",

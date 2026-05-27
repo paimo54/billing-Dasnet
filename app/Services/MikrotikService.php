@@ -23,6 +23,42 @@ class MikrotikService
     }
 
     /**
+     * Set router configuration from Router model
+     */
+    public function setRouter(\App\Models\Router $router): void
+    {
+        $this->host = $router->host;
+        $this->username = $router->username;
+        $this->password = $router->password;
+        $this->port = $router->port;
+        $this->connected = false;
+    }
+
+    /**
+     * Get router identity
+     */
+    public function getIdentity(): ?string
+    {
+        try {
+            if (!$this->connected) {
+                $this->connect();
+            }
+
+            $this->write('/system/identity/print');
+            $response = $this->read();
+
+            if (isset($response[0]['!re']['name'])) {
+                return $response[0]['!re']['name'];
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            Log::error('Get identity failed', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
      * Connect to Mikrotik router
      *
      * @return bool

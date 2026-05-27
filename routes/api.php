@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NetworkController;
+use App\Http\Controllers\RouterController;
+use App\Http\Controllers\CoverageAreaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,3 +56,26 @@ Route::middleware('auth:sanctum')->prefix('network')->name('api.network.')->grou
     // Batch operations
     Route::post('/batch/suspend', [NetworkController::class, 'batchSuspend'])->name('batch.suspend');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Router Management Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->prefix('routers')->name('api.routers.')->group(function () {
+    Route::get('/health', [RouterController::class, 'checkHealth'])->name('health');
+    Route::get('/{router}/health', [RouterController::class, 'checkRouterHealth'])->name('router.health');
+    Route::get('/statistics', [RouterController::class, 'statistics'])->name('statistics');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Coverage Area Routes (Public + Auth)
+|--------------------------------------------------------------------------
+*/
+
+// Public routes
+Route::get('/coverage-areas/geojson', [CoverageAreaController::class, 'geojson'])->name('api.coverage-areas.geojson');
+Route::get('/coverage-areas/by-region', [CoverageAreaController::class, 'byRegion'])->name('api.coverage-areas.by-region');
+

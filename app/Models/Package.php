@@ -20,6 +20,8 @@ class Package extends Model
         'price',
         'base_price',
         'tax_amount',
+        'download_speed',
+        'upload_speed',
         'description',
         'is_active',
     ];

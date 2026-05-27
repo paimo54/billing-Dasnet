@@ -8,12 +8,182 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned Features
-- Customer Self-Service Portal
+- Customer Self-Service Portal (Dashboard, Invoice History, Payment)
 - Ticketing & Support System
 - Advanced Reporting & Analytics Dashboard
 - API Development with OAuth2
 - Mobile Application for Technicians
 - Inventory & Equipment Management
+- Landing Page Views Implementation
+
+---
+
+## [2.4.0] - 2026-05-27
+
+### Added - Multi-Router Management & Customer Portal ✨
+
+#### Multi-Router Management System
+- **Router Model**: Complete router management with status tracking
+  - Router credentials (host, port, username, password)
+  - Geographic data (region, location, latitude, longitude)
+  - Capacity tracking (max_capacity, current_users)
+  - Status monitoring (active, inactive, maintenance, error)
+  - RADIUS configuration (radius_secret, use_radius)
+  - Load balancing settings (priority, auto_assign)
+  - Health monitoring (last_check, last_error)
+  - Status helper methods (isActive, isAvailable, isNearCapacity)
+  - User count management (incrementUsers, decrementUsers)
+  - Query scopes (active, available, byRegion, orderByPriority, orderByLoad)
+
+- **CoverageArea Model**: Geographic coverage management
+  - Area information (name, region, description)
+  - Geographic data (polygon_coordinates, center lat/long, radius)
+  - Service availability (is_active, service_start_date)
+  - Capacity tracking (estimated_capacity, current_subscribers)
+  - Signal quality levels (excellent, good, fair, poor)
+  - Display settings (color_hex, display_order, show_on_map)
+  - GeoJSON export for map display
+  - Primary router selection
+  - Available routers query
+  - Query scopes (active, visibleOnMap, byRegion, ordered, withCapacity)
+
+- **Database Schema**:
+  - `routers` table with comprehensive router management fields
+  - `coverage_areas` table with geographic and service data
+  - `router_coverage_area` pivot table for many-to-many relationship
+  - Enhanced `customers` table with router_id, coverage_area_id, pppoe credentials
+  - Enhanced `packages` table with download_speed, upload_speed fields
+
+#### MultiRouterService
+- **Auto-assignment**: Intelligent router selection
+  - Priority-based assignment
+  - Load-based balancing
+  - Capacity-aware selection
+  - Region-aware routing
+  - Coverage area filtering
+
+- **Router Management**:
+  - Assign customer to specific router
+  - Reassign customer between routers
+  - Remove customer from router
+  - Create PPPoE credentials
+  - Integration with FreeRADIUS and Mikrotik API
+
+- **Health Monitoring**:
+  - Check all routers health
+  - Check single router health
+  - Update router status automatically
+  - Track last check time and errors
+
+- **Load Balancing**:
+  - Balance load across routers in coverage area
+  - Move customers from overloaded routers
+  - Target load percentage calculation
+  - Automatic customer reassignment
+
+- **Statistics**:
+  - Total routers count
+  - Active/available routers
+  - Total capacity and users
+  - Average load percentage
+  - Routers near capacity
+
+#### Customer Portal & Landing Pages
+- **LandingController**: Public-facing pages
+  - Landing page with packages and coverage statistics
+  - Coverage map page with region filter
+  - Packages listing page
+  - About/service quality page
+  - Registration form with coverage area selection
+  - Registration submission handler
+  - Coverage availability checker (distance-based, 10km radius)
+
+- **Public Routes**:
+  - `GET /landing` - Homepage
+  - `GET /coverage` - Coverage map
+  - `GET /packages` - Package listing
+  - `GET /about` - About/service quality
+  - `GET /register` - Registration form
+  - `POST /register` - Submit registration
+  - `POST /check-coverage` - Check coverage availability
+
+#### Admin Controllers
+- **RouterController**: Complete router CRUD
+  - List routers with pagination
+  - Create new router
+  - Edit router configuration
+  - Delete router (with customer check)
+  - View router details
+  - Check all routers health
+  - Check single router health
+  - Get router statistics
+  - Set maintenance mode
+  - Activate router
+
+- **CoverageAreaController**: Coverage area management
+  - List coverage areas with pagination
+  - Create new coverage area
+  - Edit coverage area
+  - Delete coverage area (with customer check)
+  - View coverage area details
+  - GeoJSON endpoint for map display
+  - Filter by region
+
+#### API Endpoints
+- **Router Management**:
+  - `GET /api/routers/health` - Check all routers health
+  - `GET /api/routers/{router}/health` - Check single router health
+  - `GET /api/routers/statistics` - Get router statistics
+
+- **Coverage Areas**:
+  - `GET /api/coverage-areas/geojson` - Get GeoJSON for map display
+  - `GET /api/coverage-areas/by-region` - Filter coverage areas by region
+
+#### Enhanced Services
+- **MikrotikService**: Router model support
+  - `setRouter()` method for dynamic router configuration
+  - `getIdentity()` method for router identification
+  - Support for multiple router instances
+
+#### Enhanced Models
+- **Customer Model**: Router relationships
+  - `router()` relationship to Router model
+  - `coverageArea()` relationship to CoverageArea model
+  - `payments()` relationship to Payment model
+  - Added router_id, coverage_area_id, router_assigned_at fields
+  - Added pppoe_username, pppoe_password fields
+
+- **Package Model**: Speed fields
+  - Added download_speed field
+  - Added upload_speed field
+
+### Documentation
+- **MULTI-ROUTER-QUICKSTART.md**: Comprehensive multi-router guide
+  - Architecture overview
+  - Database schema documentation
+  - Setup instructions
+  - Usage examples
+  - Load balancing strategy
+  - API documentation
+  - File structure
+
+### Performance & Scalability
+- **Unlimited routers**: Support for any number of Mikrotik routers
+- **Load balancing**: Automatic distribution across routers
+- **Priority-based**: Intelligent router selection
+- **Capacity-aware**: Prevent router overload
+- **Geographic routing**: Region-based assignment
+- **Health monitoring**: Automatic status tracking
+
+### Technical Features
+- Many-to-many router-coverage relationship
+- Priority and signal strength per router-area pair
+- Primary router designation per coverage area
+- Distance-based coverage checking
+- GeoJSON export for map integration
+- Comprehensive query scopes
+- Status management methods
+- Capacity percentage calculation
 
 ---
 

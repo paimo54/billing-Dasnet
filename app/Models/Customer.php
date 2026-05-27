@@ -21,8 +21,14 @@ class Customer extends Model
         'phone',
         'latitude',
         'longitude',
+        'region',
         'billing_date',
         'package_id',
+        'router_id',
+        'coverage_area_id',
+        'router_assigned_at',
+        'pppoe_username',
+        'pppoe_password',
         'created_by',
         'is_active',
     ];
@@ -36,6 +42,7 @@ class Customer extends Model
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'billing_date' => 'date',
+        'router_assigned_at' => 'datetime',
         'is_active' => 'boolean',
     ];
 
@@ -61,5 +68,29 @@ class Customer extends Model
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Get the router assigned to the customer.
+     */
+    public function router()
+    {
+        return $this->belongsTo(Router::class);
+    }
+
+    /**
+     * Get the coverage area of the customer.
+     */
+    public function coverageArea()
+    {
+        return $this->belongsTo(CoverageArea::class);
+    }
+
+    /**
+     * Get the payments for the customer.
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }

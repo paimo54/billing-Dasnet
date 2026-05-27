@@ -5,6 +5,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TechnicianController;
 use App\Http\Controllers\MitraReportController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\RouterController;
+use App\Http\Controllers\CoverageAreaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,9 +21,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::redirect('/', '/login');
+Route::redirect('/', '/landing');
 
 Auth::routes();
+
+/*
+|--------------------------------------------------------------------------
+| Landing Page Routes (Public)
+|--------------------------------------------------------------------------
+*/
+Route::name('landing.')->group(function () {
+    Route::get('/landing', [LandingController::class, 'index'])->name('index');
+    Route::get('/coverage', [LandingController::class, 'coverage'])->name('coverage');
+    Route::get('/packages', [LandingController::class, 'packages'])->name('packages');
+    Route::get('/about', [LandingController::class, 'about'])->name('about');
+    Route::get('/register', [LandingController::class, 'register'])->name('register');
+    Route::post('/register', [LandingController::class, 'submitRegistration'])->name('register.submit');
+    Route::post('/check-coverage', [LandingController::class, 'checkCoverage'])->name('check-coverage');
+});
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -78,6 +96,19 @@ Route::prefix('superadmin')->name('superadmin.')->middleware(['auth', 'role:supe
     Route::get('/customers', [SuperAdminController::class, 'customerIndex'])->name('customers.index');
     Route::get('/customers/{customer}', [SuperAdminController::class, 'customerShow'])->name('customers.show');
     Route::delete('/customers/{customer}', [SuperAdminController::class, 'customerDestroy'])->name('customers.destroy');
+
+    // Manajemen Router
+    Route::resource('routers', RouterController::class);
+    Route::post('/routers/check-health', [RouterController::class, 'checkHealth'])->name('routers.check-health');
+    Route::post('/routers/{router}/check-health', [RouterController::class, 'checkRouterHealth'])->name('routers.check-router-health');
+    Route::get('/routers/statistics', [RouterController::class, 'statistics'])->name('routers.statistics');
+    Route::post('/routers/{router}/maintenance', [RouterController::class, 'setMaintenance'])->name('routers.maintenance');
+    Route::post('/routers/{router}/activate', [RouterController::class, 'activate'])->name('routers.activate');
+
+    // Manajemen Coverage Area
+    Route::resource('coverage-areas', CoverageAreaController::class);
+    Route::get('/coverage-areas/geojson', [CoverageAreaController::class, 'geojson'])->name('coverage-areas.geojson');
+    Route::get('/coverage-areas/by-region', [CoverageAreaController::class, 'byRegion'])->name('coverage-areas.by-region');
 });
 
 // Route untuk Admin
@@ -124,6 +155,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     
     // Export customers
     Route::post('/customers/export', [AdminController::class, 'exportCustomers'])->name('customers.export');
+
+    // Manajemen Router
+    Route::resource('routers', RouterController::class);
+    Route::post('/routers/check-health', [RouterController::class, 'checkHealth'])->name('routers.check-health');
+    Route::post('/routers/{router}/check-health', [RouterController::class, 'checkRouterHealth'])->name('routers.check-router-health');
+    Route::get('/routers/statistics', [RouterController::class, 'statistics'])->name('routers.statistics');
+    Route::post('/routers/{router}/maintenance', [RouterController::class, 'setMaintenance'])->name('routers.maintenance');
+    Route::post('/routers/{router}/activate', [RouterController::class, 'activate'])->name('routers.activate');
+
+    // Manajemen Coverage Area
+    Route::resource('coverage-areas', CoverageAreaController::class);
+    Route::get('/coverage-areas/geojson', [CoverageAreaController::class, 'geojson'])->name('coverage-areas.geojson');
+    Route::get('/coverage-areas/by-region', [CoverageAreaController::class, 'byRegion'])->name('coverage-areas.by-region');
 });
 
 // Route untuk Teknisi
