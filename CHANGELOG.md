@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned Features
-- Payment Gateway Integration (Midtrans, Xendit)
 - Mikrotik RouterOS API Integration for auto-suspend/unsuspend
 - Customer Self-Service Portal
 - Ticketing & Support System
@@ -16,6 +15,125 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API Development with OAuth2
 - Mobile Application for Technicians
 - Inventory & Equipment Management
+
+---
+
+## [2.2.0] - 2026-05-27
+
+### Added - Payment Gateway Integration ✨
+
+#### Payment Gateway Services
+- **DuitkuService**: Complete integration with Duitku payment gateway
+  - Support Virtual Account (BCA, Mandiri, BNI, BRI, Permata, CIMB, Danamon, dll)
+  - Support E-Wallet (OVO, ShopeePay, LinkAja, DANA)
+  - Support Retail (Indomaret, Alfamart)
+  - Support QRIS (Nobu, ShopeePay QRIS)
+  - Automatic signature generation and validation
+  - Callback handling with signature verification
+  - Payment status checking
+  - Get available payment methods API
+
+- **QrisService**: QRIS Dynamic payment integration
+  - Generate unique QRIS code per transaction
+  - 24-hour expiry time
+  - Callback handling with HMAC signature validation
+  - Payment status checking
+  - Support for QRIS string and image URL
+
+#### Database Schema
+- **payments table**: Comprehensive payment tracking
+  - Foreign keys to invoices and customers
+  - Payment gateway and method tracking
+  - Transaction and reference IDs
+  - Amount, admin fee, and total amount
+  - Payment status (pending, processing, success, failed, expired, cancelled)
+  - Virtual Account and QRIS data storage
+  - Callback data storage (JSON)
+  - IP address and user agent tracking
+  - Soft deletes support
+  - 10+ indexes for performance
+
+#### Payment Model
+- **Payment Model** with complete functionality:
+  - Status constants and helper methods
+  - Gateway constants
+  - Relationships to Invoice and Customer
+  - Status checking methods (isPending, isSuccess, isFailed, isExpired)
+  - Status update methods (markAsSuccess, markAsFailed, markAsExpired)
+  - Query scopes (pending, success, gateway)
+
+#### API Endpoints
+- `POST /api/payment/create`: Create payment transaction
+- `POST /api/payment/duitku/callback`: Duitku webhook handler
+- `POST /api/payment/qris/callback`: QRIS webhook handler
+- `GET /api/payment/{payment}/status`: Check payment status
+- `GET /api/payment/invoice/{invoice}/history`: Get payment history
+
+#### Web Routes
+- `GET /payment/invoice/{invoice}`: Payment page
+- `GET /payment/success`: Payment success page
+- `GET /payment/failed`: Payment failed page
+
+#### Payment Controller
+- Complete payment flow handling
+- Create payment with gateway selection
+- Callback processing for both gateways
+- Payment status checking
+- Payment history retrieval
+- Success and failed page rendering
+
+#### Console Command
+- **payment:auto-expire**: Automatically expire pending payments
+  - Configurable expiry time
+  - Dry-run mode for testing
+  - Detailed logging and reporting
+  - Cron-ready for automation
+
+#### Configuration
+- **config/payment.php**: Complete payment configuration
+  - Duitku settings (merchant code, API key, URLs)
+  - QRIS settings (merchant ID, API key, URLs)
+  - Payment methods configuration
+  - Admin fee settings
+  - Min/max amount limits
+  - Enable/disable payment methods
+
+### Enhanced Models
+- **Invoice Model**: Added payment relationships
+  - `payments()`: Get all payments
+  - `latestPayment()`: Get latest payment
+  - `successfulPayment()`: Get successful payment
+
+### Documentation
+- **PAYMENT-GATEWAY.md**: Comprehensive payment gateway documentation
+  - Overview and supported methods
+  - Database schema
+  - Configuration guide
+  - API endpoints documentation
+  - Usage examples
+  - Payment flow diagrams
+  - Security guidelines
+  - Testing guide
+  - Troubleshooting
+  - Production checklist
+
+### Technical Features
+- Signature validation for security
+- Callback data storage for audit trail
+- Automatic payment expiry
+- Transaction ID generation
+- Phone number formatting
+- IP and user agent tracking
+- Comprehensive error handling
+- Detailed logging
+
+### Security
+- Signature validation for all callbacks
+- HMAC SHA256 for QRIS
+- MD5 signature for Duitku
+- Callback data verification
+- Amount consistency checking
+- Duplicate payment prevention
 
 ---
 

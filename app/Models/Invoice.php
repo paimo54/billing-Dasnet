@@ -112,4 +112,28 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'printed_by');
     }
+
+    /**
+     * Get the payments for the invoice.
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    /**
+     * Get the latest payment for the invoice.
+     */
+    public function latestPayment()
+    {
+        return $this->hasOne(Payment::class)->latestOfMany();
+    }
+
+    /**
+     * Get successful payment for the invoice.
+     */
+    public function successfulPayment()
+    {
+        return $this->hasOne(Payment::class)->where('status', Payment::STATUS_SUCCESS);
+    }
 }

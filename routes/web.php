@@ -4,6 +4,7 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TechnicianController;
 use App\Http\Controllers\MitraReportController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +23,17 @@ Route::redirect('/', '/login');
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+/*
+|--------------------------------------------------------------------------
+| Payment Routes (Public)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('payment')->name('payment.')->group(function () {
+    Route::get('/invoice/{invoice}', [PaymentController::class, 'show'])->name('show');
+    Route::get('/success', [PaymentController::class, 'success'])->name('success');
+    Route::get('/failed', [PaymentController::class, 'failed'])->name('failed');
+});
 
 // Route untuk SuperAdmin
 Route::prefix('superadmin')->name('superadmin.')->middleware(['auth', 'role:superadmin'])->group(function () {
