@@ -17,3 +17,22 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.sql
+*.sql.gz
+vendor.zip
+
+# Logs
+*.log
+
+# Temporary files
+/tmp
+/temp
+
+# Submodules or external directories
+/inet
